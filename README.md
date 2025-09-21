@@ -1,11 +1,19 @@
 # 🍔 Sistema de Gerenciamento de Pedidos
 
 ## 👥 Equipe
+<<<<<<< HEAD
+- Membro 1: Nycolle Khetlem
+- Membro 2: Katarine Meira
+- Membro 3: Samily Sena
+- Membro 4: Tarscilla Almeida
+- Membro 5: Pedro Henrique Ferreira
+=======
 - Membro 1: Katarine Meira 
 - Membro 2: Nycolle Khetlem
 - Membro 3: Pedro Ferreira
 - Membro 4: Samily Sena
 - Membro 5: Tarcilla Almeida
+>>>>>>> origin/main
 
 ---
 

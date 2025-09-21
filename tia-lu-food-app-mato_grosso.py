@@ -86,7 +86,37 @@ def cadastrarItem():
     return
      
 def atualizarItens():
-    print('oi')
+    if not itemCadastrado: 
+        print("O sistema ainda não possui um item cadastrado.")
+        return
+
+
+    print("\n=== ITENS CADASTRADOS ===")
+    for i, item in enumerate(itemCadastrado):
+        print(f"[{i}] {item[0]} (R${item[3]} - estoque: {item[4]})")
+
+    try: 
+        indice = int(input("\nDigite o número do item que será atualizado:"))
+        if indice < 0 or indice >= len(itemCadastrado):
+            print("Item inválido.")
+            return
+    except ValueError:
+        print("Digite um item já cadastrado")
+        return
+    
+    nome, descricao, codigo, preco, estoque = itemCadastrado[indice]
+
+    print("\nDeixe em branco apenas o campo que não será alterado.")
+
+    nome_atual = input(f"Nome atual [{nome}]: ") or nome
+    descricao_atual = input(f"Descrição atual [{descricao}]: ") or descricao
+    preco_atual = input(f"Preço atual [{preco}]:") or preco
+    estoque_atual = input(f"Estoque atual [{estoque}]:") or estoque
+
+    # ITENS ATUALIZADOS
+    itemCadastrado[indice]= (nome_atual, descricao_atual, codigo, preco_atual, estoque_atual)
+
+    print("\nItens atualizados!")
 
 
 def consultarItens():
@@ -97,14 +127,14 @@ def consultarItens():
 
 
 def detalhesItens():
-    print("\n===== DetalheS do Item =====\n")
+    print("\n===== Detalhes do Item =====\n")
     for item in itemCadastrado:
-        print(f"Nome: {item[1]}")
-        print(f"Descrição: {item[2]}")
-        print(f"Código: {item[0]}")
+        print(f"Nome: {item[0]}")
+        print(f"Descrição: {item[1]}")
+        print(f"Código: {item[2]}")
         print(f"Preço: R$ {float(item[3]):.2f}")
         print(f"Estoque: {item[4]}\n")           
-        
+
             
 
 # FUNÇÕES DE MENU PEDIDOS ->>>
