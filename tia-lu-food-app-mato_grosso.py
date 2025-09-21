@@ -56,7 +56,7 @@ itemCadastrado = [cadastrarItem()]
 
 
 def atualizarItens():
-    print('oi')
+    print("oi")
 
 
 def consultarItens():
