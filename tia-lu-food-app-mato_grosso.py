@@ -51,8 +51,7 @@ def cadastrarItem():
 
     return (nome, descricao, preco, estoque)
 
-    # lista com os itens cadastrados ->
-itemCadastrado = [cadastrarItem()]
+    
 
 
 def atualizarItens():
@@ -94,6 +93,8 @@ while controle == True:
                 match escolha:
                     case '1':
                         cadastrarItem()
+                        # lista com os itens cadastrados ->
+                        itemCadastrado = [cadastrarItem()]
                     case '2':
                         atualizarItens()
                     case '3':
@@ -105,6 +106,7 @@ while controle == True:
                     case _:
                         print("Opção inválida")
         case '2':
+            while True:
                 escolha = menuPedidos()
                 match escolha:
                     case '1':
