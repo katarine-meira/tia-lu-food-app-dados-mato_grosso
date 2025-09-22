@@ -62,9 +62,9 @@ def menuPedidos():
 def novoItem():
     while True:
         print("\nEscolha o próximo passo\n")
-        print("1 - Cadastrar novo produto.")
-        print("2 - Listar produtos cadastrados.")
-        print("3 - Voltar ao menu de itens.")
+        print("[1] - Cadastrar novo produto.")
+        print("[2] - Listar produtos cadastrados.")
+        print("[0] - Voltar ao menu de itens.")
         
         opcao = input("\n>>: ")
     
@@ -78,7 +78,7 @@ def novoItem():
                         print(item)
                 else: 
                     print("\nNenhum produto cadastrado.")
-            case "3":
+            case "0":
                 print("\nRetornando ao menu de itens...\n")
                 break
             case _:
@@ -285,21 +285,20 @@ def atualizarStatusPedido():
 
 def cancelarPedido():
     global pedidosPendentes, filaPreparo, cancelados
-    # iniciar uma lista pra guardar o que o usuario pode cancelar
+    # montando a lista de pedidos canceláveis
     cancelaveis = []
     for nome_lista, lista_pedidos in [("Pendentes", pedidosPendentes), ("Fila de Preparo", filaPreparo)]:
         for pedido in lista_pedidos:
             status = pedido.get("status", "")
             if status in ("Aguardando Aprovação", "Aprovado"):
                 cancelaveis.append((nome_lista, pedido))
-                
+    # se nao tiver nenhum pedido cancelável vai avisar e sair 
     if not cancelaveis:
             print("\nNão há pedidos canceláveis no momento.")
             return
-    
+    # mostrando os pedidos que podem ser cancelados 
     print("\n====== Pedidos Canceláveis ======")
     for i, (nome_lista, pedido) in enumerate(cancelaveis):
-        nome_label = pedido.get("produtos", [{}])[0].get("nome", "Sem produtos")
         print(f"[{i}] {pedido['produtos'][0]['nome']} | Status: {pedido['status']}")
     # lendo a escolha do usuário 
     try: 
@@ -317,7 +316,6 @@ def cancelarPedido():
     pedido["status"] = "Cancelado"
     cancelados.append(pedido)
     print("\nPedido cancelado com sucesso!")
-        
 
 # LOOPING DO SISTEMA ->>>
 
