@@ -50,7 +50,7 @@ def menuPedidos():
     [1] \tCriar Pedido 
     [2] \tProcessar Pedidos Pendentes
     [3] \tAtualizar Status de Pedido
-    [4] \tCacelar Pedido
+    [4] \tCancelar Pedido
     [0] \tSair
 
     => """
@@ -284,8 +284,40 @@ def atualizarStatusPedido():
     
 
 def cancelarPedido():
-    print('oi')
+    global pedidosPendentes, filaPreparo, cancelados
+    # iniciar uma lista pra guardar o que o usuario pode cancelar
+    cancelaveis = []
+    for nome_lista, lista_pedidos in [("Pendentes", pedidosPendentes), ("Fila de Preparo", filaPreparo)]:
+        for pedido in lista_pedidos:
+            status = pedido.get("status", "")
+            if status in ("Aguardando Aprovação", "Aprovado"):
+                cancelaveis.append((nome_lista, pedido))
+                
+    if not cancelaveis:
+            print("\nNão há pedidos canceláveis no momento.")
+            return
     
+    print("\n====== Pedidos Canceláveis ======")
+    for i, (nome_lista, pedido) in enumerate(cancelaveis):
+        nome_label = pedido.get("produtos", [{}])[0].get("nome", "Sem produtos")
+        print(f"[{i}] {pedido['produtos'][0]['nome']} | Status: {pedido['status']}")
+    # lendo a escolha do usuário 
+    try: 
+        escolha = int(input("\nDigite o número do pedido para cancelar: "))
+        nome_lista, pedido = cancelaveis[escolha]
+    except (ValueError, IndexError):
+        print("Opção inválida.")
+        return
+    # removendo pedido das listas originais 
+    if pedido in pedidosPendentes:
+        pedidosPendentes.remove(pedido)
+    elif pedido in filaPreparo:
+        filaPreparo.remove(pedido)
+    # marcando como cancelado 
+    pedido["status"] = "Cancelado"
+    cancelados.append(pedido)
+    print("\nPedido cancelado com sucesso!")
+        
 
 # LOOPING DO SISTEMA ->>>
 
