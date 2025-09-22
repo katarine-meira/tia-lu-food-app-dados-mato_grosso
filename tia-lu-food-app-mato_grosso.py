@@ -175,6 +175,7 @@ def criarPedido():
     if itemCadastrado:
         consultarItens()
         pedido_usuario = {
+            "id_pedido": str(uuid.uuid4()) [:6],
             "produtos": [],   # lista de produtos desse pedido
             "status": "Aguardando Aprovação" # status inicial
         }
@@ -268,7 +269,19 @@ def ProcessarPedidos():
         print("\nNenhum pedido novo no sistema.")
 
 def atualizarStatusPedido():
-    print('oi')
+    print("\nPEDIDOS EM PREPARO: \n")
+    if not filaPreparo:
+        print("NENHUM PEDIDO A SER ATUALIZADO!")
+    numeroPedido = (input(f"Nº ID do pedido: "))
+    for pedido in filaPreparo:
+        if pedido['id_pedido'] == numeroPedido:
+            print(f"id_pedido: {pedido ['id_pedido']}")
+            print("ITENS ADICIONADOS:\n" + pedido['produtos'] [0] ['nome'])
+            print("STATUS DO PEDIDO:\n" + pedido['status'])
+            break
+        else:
+            print("PEDIDO NÃO ENCONTRADO!")
+    
 
 def cancelarPedido():
     print('oi')
