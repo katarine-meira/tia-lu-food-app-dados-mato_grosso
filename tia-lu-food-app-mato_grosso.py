@@ -2,6 +2,20 @@ import uuid
 
 itemCadastrado = []
 
+# FUNÇÕES REUTILIZAVEIS ->>>
+
+def sair():
+    escolhaSair = """
+    ============= DESEJA SAIR? ===============
+    
+    [1] \tNão
+    [0] \tSair
+    
+    => """
+    
+    return input(escolhaSair)
+
+
 # MENUS ->>>
 
 def escolhaMenu():
@@ -50,7 +64,7 @@ def novoItem():
         print("\nEscolha o próximo passo\n")
         print("1 - Cadastrar novo produto.")
         print("2 - Listar produtos cadastrados.")
-        print("3 - Voltar ao menu inicial")
+        print("3 - Voltar ao menu de itens.")
         
         opcao = input("\n>>: ")
     
@@ -65,7 +79,7 @@ def novoItem():
                 else: 
                     print("\nNenhum produto cadastrado.")
             case "3":
-                print("Retornando ao menu inicial...\n")
+                print("\nRetornando ao menu de itens...\n")
                 break
             case _:
                 print("Opção inválida. Tente novamente.")
@@ -87,7 +101,7 @@ def cadastrarItem():
      
 def atualizarItens():
     if not itemCadastrado: 
-        print("O sistema ainda não possui um item cadastrado.")
+        print("\nO sistema ainda não possui um item cadastrado.")
         return
 
 
@@ -121,29 +135,137 @@ def atualizarItens():
 
 def consultarItens():
     if itemCadastrado:
-        print(itemCadastrado[0][0])
+        print("\n===== Itens Disponíveis =====")
+        for i, item in enumerate(itemCadastrado):
+            print(f"[{i}] {item[0]} (R${item[3]} - Descrição: {item[1]})")
     else:
-        print("Nenhum item cadastrado.")
+        print("\nNenhum item cadastrado.")
 
 
 def detalhesItens():
-    print("\n===== Detalhes do Item =====\n")
-    for item in itemCadastrado:
-        print(f"Nome: {item[0]}")
-        print(f"Descrição: {item[1]}")
-        print(f"Código: {item[2]}")
-        print(f"Preço: R$ {float(item[3]):.2f}")
-        print(f"Estoque: {item[4]}\n")           
 
+    if itemCadastrado:
+        print("\n===== Detalhes do Item =====\n")
+        for item in itemCadastrado:
+            print(f"Nome: {item[0]}")
+            print(f"Descrição: {item[1]}")
+            print(f"Código: {item[2]}")
+            print(f"Preço: R$ {float(item[3].replace(',', '.')):.2f}")
+            print(f"Estoque: {item[4]}\n")           
+    else:
+        print("\nNenhum item cadastrado.")
             
 
 # FUNÇÕES DE MENU PEDIDOS ->>>
 
-def criarPedido():
-    print('oi')
+def adicionarPedido():
+    escolhaPedido = """
+    ============= ESCOLHA ===============
     
+    [1] \tAdicionar mais produtos
+    [0] \tSair
+    
+    => """
+    
+    return input(escolhaPedido)
+
+pedidosPendentes = []
+
+def criarPedido():
+    if itemCadastrado:
+        consultarItens()
+        pedido_usuario = {
+            "produtos": [],   # lista de produtos desse pedido
+            "status": "Aguardando Aprovação" # status inicial
+        }
+        qtd_produto = True
+        while qtd_produto == True:
+            try:
+                indice = int(input("\nDigite o número do produto que deseja: "))
+            except ValueError:
+                print("Digite um número válido.")
+                continue
+            
+            if 0 <= indice < len(itemCadastrado):
+                pedido = {
+                    "nome": itemCadastrado[indice][0],
+                    # "descricao": itemCadastrado[indice][1],
+                    "codigo": itemCadastrado[indice][2],
+                    # "preco": itemCadastrado[indice][3],
+                    # "estoque": itemCadastrado[indice][4],
+                }
+                pedido_usuario["produtos"].append(pedido)
+
+                print("\nSua lista atual de pedidos:")
+                for p in pedido_usuario["produtos"]:
+                    print(f"- {p['nome']}")
+
+                controle = True
+                while controle == True:
+    
+                    match adicionarPedido():
+                        case '1':
+                            consultarItens()
+                            controle = False
+                        case '0':
+                            qtd_produto = False
+                            controle = False 
+                        case _:
+                            print("\nOpção inválida")
+            else:
+                print("\nÍndice inválido.")
+                controle2=True
+                while controle2 == True:
+                    match sair():
+                        case '1':
+                            break
+                        case '0':
+                            controle2=False
+                            qtd_produto = False
+                        case _:
+                            print("\nOpção inválida")
+        
+        if pedido_usuario["produtos"]:
+            pedidosPendentes.append(pedido_usuario)
+            print(f"\nPedido enviado para aprovação!")
+            print(pedidosPendentes)
+        else:
+            print("\nNenhum produto adicionado, pedido não criado.")
+    else:
+        print("\nNenhum produto no sistema.")
+
+filaPreparo = []
+
+cancelados = []
+
 def ProcessarPedidos():
-    print('oi')
+    if pedidosPendentes:
+        while pedidosPendentes:
+            pedido = pedidosPendentes[0]
+            print("\n===== Pedidos pendentes =====")
+            print(f"Código - {pedido['produtos'][0]['codigo']} ({pedido['produtos'][0]['nome']} - Status: {pedido['status']})")
+            print(f"\n===== Pedido {pedido['produtos'][0]['codigo']} =====")
+            print("[1] Aceitar")
+            print("[2] Rejeitar")
+            print("[0] Sair")
+            opcao = input("\n>>: ")
+
+            if opcao == '1':  
+                pedido['status'] = "Aprovado"
+                linha = pedidosPendentes.pop(0)
+                filaPreparo.append(linha)
+                print("\nPedido aceito!")
+            elif opcao == '2':
+                pedido['status'] = "Cancelado"
+                linha = pedidosPendentes.pop(0)
+                cancelados.append(linha)
+                print("\nPedido cancelado!")
+            elif opcao == '0':
+                return
+            else:
+                print("\nOpção inválida")
+    else:
+        print("\nNenhum pedido novo no sistema.")
 
 def atualizarStatusPedido():
     print('oi')
