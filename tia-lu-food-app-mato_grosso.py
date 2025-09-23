@@ -255,7 +255,7 @@ def ProcessarPedidos():
                 pedido['status'] = "Aprovado, em preparo!"
                 linha = pedidosPendentes.pop(0)
                 filaPreparo.append(linha)
-                print("\nPedido aceito!")
+                print(f"\nPedido " + pedido['id_pedido'] + " aceito!")
             elif opcao == '2':
                 pedido['status'] = "Cancelado"
                 linha = pedidosPendentes.pop(0)
