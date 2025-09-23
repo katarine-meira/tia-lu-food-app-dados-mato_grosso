@@ -252,7 +252,7 @@ def ProcessarPedidos():
             opcao = input("\n>>: ")
 
             if opcao == '1':  
-                pedido['status'] = "Aprovado"
+                pedido['status'] = "Aprovado, em preparo!"
                 linha = pedidosPendentes.pop(0)
                 filaPreparo.append(linha)
                 print("\nPedido aceito!")
@@ -269,18 +269,41 @@ def ProcessarPedidos():
         print("\nNenhum pedido novo no sistema.")
 
 def atualizarStatusPedido():
+    fluxoStatus = [
+        'Aceito!',
+        'Em preparo!',
+        'Pedido pronto!',
+        'Aguardando o entregador!',
+        'Seu pedido saiu para entrega!',
+        'Pedido entregue!'
+    ]
     print("\nPEDIDOS EM PREPARO: \n")
+
     if not filaPreparo:
         print("NENHUM PEDIDO A SER ATUALIZADO!")
-    numeroPedido = (input(f"Nº ID do pedido: "))
+        return
+# Nesse input, o usuário deve escrever o ID gerado para o pedido        
+    numeroPedido = (input(f"Nº ID do pedido: "))    
     for pedido in filaPreparo:
         if pedido['id_pedido'] == numeroPedido:
-            print(f"id_pedido: {pedido ['id_pedido']}")
+            print(f"\nPedido encontrado!")
+            print(f"id_pedido: {pedido['id_pedido']}")
             print("ITENS ADICIONADOS:\n" + pedido['produtos'] [0] ['nome'])
-            print("STATUS DO PEDIDO:\n" + pedido['status'])
-            break
+            
+            if pedido['status'] in fluxoStatus:
+                indice = fluxoStatus.index(pedido['status'])
+                if indice < len(fluxoStatus) - 1:
+                    pedido['status'] = fluxoStatus[indice + 1]
+                else:
+                    print("\nEste pedido já foi atualizado!")
+                    return
+            else:
+                pedido['status'] = fluxoStatus [0]
+                
+            print(f"Status do pedido {pedido['id_pedido']} atualizado para: {pedido['status']}")
+            return
         else:
-            print("PEDIDO NÃO ENCONTRADO!")
+            print("\nPedido não encontrado!")
     
 
 def cancelarPedido():
