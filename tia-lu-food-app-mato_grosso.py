@@ -87,7 +87,13 @@ def novoItem():
 def cadastrarItem():
     nome = input("Digite o nome do produto: ")
     descricao = (input("Digite a descrição do produto: "))
-    preco = (input("Digite o preço do produto: "))
+    while True:
+        try:
+            preco = float(input("Digite o preço do produto (use '.' para decimais): "))
+            break
+        except ValueError:
+            print("Digite o valor usando '.'(ponto)")
+            continue
     estoque = (input("Digite a quantidade do estoque: "))
     
     numero = int(uuid.uuid4().int %100000)
@@ -150,7 +156,7 @@ def detalhesItens():
             print(f"Nome: {item[0]}")
             print(f"Descrição: {item[1]}")
             print(f"Código: {item[2]}")
-            print(f"Preço: R$ {float(item[3].replace(',', '.')):.2f}")
+            print(f"Preço: R$ {float(item[3].replace(',', '.')):.2f}")  #vou tirar o replace depois -kat
             print(f"Estoque: {item[4]}\n")           
     else:
         print("\nNenhum item cadastrado.")
@@ -192,7 +198,7 @@ def criarPedido():
                     "nome": itemCadastrado[indice][0],
                     # "descricao": itemCadastrado[indice][1],
                     "codigo": itemCadastrado[indice][2],
-                    # "preco": itemCadastrado[indice][3],
+                    "preco": itemCadastrado[indice][3],
                     # "estoque": itemCadastrado[indice][4],
                 }
                 pedido_usuario["produtos"].append(pedido)
@@ -229,7 +235,6 @@ def criarPedido():
         if pedido_usuario["produtos"]:
             pedidosPendentes.append(pedido_usuario)
             print(f"\nPedido enviado para aprovação!")
-            print(pedidosPendentes)
         else:
             print("\nNenhum produto adicionado, pedido não criado.")
     else:
@@ -237,29 +242,47 @@ def criarPedido():
 
 filaPreparo = []
 
-cancelados = []
+filaRejeitados = []
 
 def ProcessarPedidos():
     if pedidosPendentes:
         while pedidosPendentes:
             pedido = pedidosPendentes[0]
-            print("\n===== Pedidos pendentes =====")
-            print(f"Código - {pedido['produtos'][0]['codigo']} ({pedido['produtos'][0]['nome']} - Status: {pedido['status']})")
+            print("\n===== Pedido pendente =====")
+            print(f"Código do pedido - {pedido['id_pedido']} (Status: {pedido['status']})")
+            for produto in pedido['produtos']:
+                print(f"   - {produto['nome']} (id: {produto['codigo']})")
             print(f"\n===== Pedido {pedido['produtos'][0]['codigo']} =====")
-            print("[1] Aceitar")
+            print("[1] Aceitar (pagamento)")
             print("[2] Rejeitar")
             print("[0] Sair")
             opcao = input("\n>>: ")
 
-            if opcao == '1':  
-                pedido['status'] = "Aprovado, em preparo!"
+            if opcao == '1':
+                valor_total = 0
+                for produto in pedido['produtos']:
+                    valor_total = valor_total + produto['preco']
+                while True:
+                    try:
+                        cupom = input("Deseja utilizar o cupom de desconto do dia?[s ou n]: ")
+                        break
+                    except ValueError:
+                        print("Digite 's' para sim, ou 'n' para não.")
+                        continue
+                if(cupom == 's'):
+                    desconto = valor_total/10
+                    valor_final = valor_total - desconto
+                    print(f"\nValor total pago: {valor_final}")
+                else:
+                    print(f"\nValor total pago: {valor_total}")
+                pedido['status'] = "Aceito"
                 linha = pedidosPendentes.pop(0)
                 filaPreparo.append(linha)
                 print(f"\nPedido " + pedido['id_pedido'] + " aceito!")
             elif opcao == '2':
-                pedido['status'] = "Cancelado"
+                pedido['status'] = "Rejeitado"
                 linha = pedidosPendentes.pop(0)
-                cancelados.append(linha)
+                filaRejeitados.append(linha)
                 print("\nPedido cancelado!")
             elif opcao == '0':
                 return
@@ -270,25 +293,29 @@ def ProcessarPedidos():
 
 def atualizarStatusPedido():
     fluxoStatus = [
-        'Aceito!',
-        'Em preparo!',
+        'Em preparo',
         'Pedido pronto!',
         'Aguardando o entregador!',
         'Seu pedido saiu para entrega!',
         'Pedido entregue!'
     ]
-    print("\nPEDIDOS EM PREPARO: \n")
+    print("\nPEDIDOS EM PROCESSO: \n")
+    for pedido in (filaPreparo):
+        print(f"ID do Pedido - {pedido['id_pedido']} (Status: {pedido['status']})")
+        for produto in pedido['produtos']:
+            print(f"   - {produto['nome']}")
+        print()
 
     if not filaPreparo:
         print("NENHUM PEDIDO A SER ATUALIZADO!")
         return
 # Nesse input, o usuário deve escrever o ID gerado para o pedido        
-    numeroPedido = (input(f"Nº ID do pedido: "))    
+    numeroPedido = (input(f"Nº ID do pedido que deseja atualizar: "))    
     for pedido in filaPreparo:
         if pedido['id_pedido'] == numeroPedido:
             print(f"\nPedido encontrado!")
             print(f"id_pedido: {pedido['id_pedido']}")
-            print("ITENS ADICIONADOS:\n" + pedido['produtos'] [0] ['nome'])
+            # print("ITENS ADICIONADOS:\n" + pedido['produtos'] [0] ['nome'])
             
             if pedido['status'] in fluxoStatus:
                 indice = fluxoStatus.index(pedido['status'])
@@ -305,15 +332,15 @@ def atualizarStatusPedido():
         else:
             print("\nPedido não encontrado!")
     
-
+filaCancelados =[]
 def cancelarPedido():
-    global pedidosPendentes, filaPreparo, cancelados
+    global pedidosPendentes, filaPreparo, filaCancelados
     # montando a lista de pedidos canceláveis
     cancelaveis = []
     for nome_lista, lista_pedidos in [("Pendentes", pedidosPendentes), ("Fila de Preparo", filaPreparo)]:
         for pedido in lista_pedidos:
             status = pedido.get("status", "")
-            if status in ("Aguardando Aprovação", "Aprovado"):
+            if status in ("Aguardando Aprovação", "Aceito"):
                 cancelaveis.append((nome_lista, pedido))
     # se nao tiver nenhum pedido cancelável vai avisar e sair 
     if not cancelaveis:
@@ -322,7 +349,8 @@ def cancelarPedido():
     # mostrando os pedidos que podem ser cancelados 
     print("\n====== Pedidos Canceláveis ======")
     for i, (nome_lista, pedido) in enumerate(cancelaveis):
-        print(f"[{i}] {pedido['produtos'][0]['nome']} | Status: {pedido['status']}")
+        nomes_produtos = ", ".join([produto['nome'] for produto in pedido['produtos']])
+        print(f"[{i}] {nomes_produtos} | Status: {pedido['status']}")
     # lendo a escolha do usuário 
     try: 
         escolha = int(input("\nDigite o número do pedido para cancelar: "))
@@ -337,7 +365,7 @@ def cancelarPedido():
         filaPreparo.remove(pedido)
     # marcando como cancelado 
     pedido["status"] = "Cancelado"
-    cancelados.append(pedido)
+    filaCancelados.append(pedido)
     print("\nPedido cancelado com sucesso!")
 
 # LOOPING DO SISTEMA ->>>
