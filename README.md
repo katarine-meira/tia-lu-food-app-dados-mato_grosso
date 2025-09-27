@@ -6,7 +6,7 @@
 - Membro 2: Nycolle Khetlem
 - Membro 3: Pedro Ferreira
 - Membro 4: Samily Sena
-- Membro 5: Tarcilla Almeida
+- Membro 5: Tarscilla Almeida
 
 ---
 

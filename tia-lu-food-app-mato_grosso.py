@@ -412,5 +412,3 @@ while controle == True:
             controle = False
         case _:
             print("Opção inválida")
-
-    
