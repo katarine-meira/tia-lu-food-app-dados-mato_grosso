@@ -1,6 +1,6 @@
-import uuid
-
 itemCadastrado = []
+contador_produto = 1
+contador_pedido = 1
 
 # FUNÇÕES REUTILIZAVEIS ->>>
 
@@ -152,6 +152,7 @@ def novoItem():
                 print("Opção inválida. Tente novamente.")
             
 def cadastrarItem():
+    global contador_produto
     nome = input("Digite o nome do produto: ")
     descricao = (input("Digite a descrição do produto: "))
     while True:
@@ -163,8 +164,8 @@ def cadastrarItem():
             continue
     estoque = int(input("Digite a quantidade do estoque: "))
     
-    numero = int(uuid.uuid4().int %100000)
-    codigo = f"PRO{numero:04d}"
+    codigo = f"PRO{contador_produto:04d}"
+    contador_produto += 1
     
     item = [nome, descricao, codigo, preco, estoque]  # <-- lista
     itemCadastrado.append(item)
@@ -235,13 +236,15 @@ def detalhesItens():
 pedidosPendentes = []
 
 def criarPedido():
+    global contador_pedido
     if itemCadastrado:
         consultarItens()
         pedido_usuario = {
-            "id_pedido": str(uuid.uuid4()) [:6],
+            "id_pedido": f"PED{contador_pedido:04d}",
             "produtos": [],   # lista de produtos desse pedido
             "status": "Aguardando Aprovação" # status inicial
         }
+        contador_pedido += 1
         qtd_produto = True
         while qtd_produto == True:
             try:
