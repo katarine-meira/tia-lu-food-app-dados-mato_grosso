@@ -433,9 +433,40 @@ def cancelarPedido():
     print("\nPedido cancelado com sucesso!")
 
 def exibirPedidos():
-    print("oi")
+    print("\n========= PEDIDOS: ==========")
+    if not (pedidosPendentes or filaPreparo or filaRejeitados or filaCancelados):
+        print("Nenhum pedido encontrado.")
+        return
+    
+    def mostrar_lista (nome, lista):
+        if lista:
+            print (f"\n ==== {nome} ====") 
+            for pedido in lista:
+                nome_produto = ", ".join([p['nome'] for p in pedido ['produtos']])
+                total = pedido.get("valor_final_pago", "N/A")
+                print (f"ID: {pedido['id_pedido']}  Produto: {nome_produto} | Status: {pedido['status']} | valor: {total}")
+
+    mostrar_lista("Pendentes", pedidosPendentes)
+    mostrar_lista("Em preparo", filaPreparo)
+    mostrar_lista("Rejeitados", filaRejeitados)
+    mostrar_lista("Cancelados", filaCancelados)
+
 def filtroStatus():
-    print("oi")
+    print("\n========= FILTRAR PEDIDO POR STATUS ==========")
+    status = input("Digite o status que deseja filtrar (Ex: 'Pedido pronto', 'Em preparo', 'saiu para entrega'): ")
+
+    fila_pedido = pedidosPendentes + filaCancelados + filaPreparo + filaRejeitados
+    filtrado = [p for p in fila_pedido if p['status'].lower()]
+
+    if not filtrado:
+        print(f"\nNenhum pedido encontrado.")
+    else: 
+        print(f"\nPedidos com status {status}:")
+        for pedido in filtrado:
+            nome_produto = ", ".join([p['nome'] for p in pedido['produtos']])
+            total = pedido.get("valor_final_pago", "N/A")
+            print(f"ID: {pedido['id_pedido']} | Produtos: {nome_produto} | valor Total: {total}")
+
 
 def relatorioVendas():
     totalFaturamento = 0
